@@ -12,20 +12,17 @@ import torch.nn.functional as F
 from torch.nn.utils.rnn import pad_packed_sequence, pack_padded_sequence, pad_sequence
 
 class LSTM_Bi(nn.Module):
-
-    def __init__(self, embedding_dim, hidden_dim, vocab_size, device, forward_mode):
+    def __init__(self, in_dim, embedding_dim, hidden_dim, out_dim, device, fixed_len):
         super(LSTM_Bi, self).__init__()
         self.device = device
-        self.embedding_dim = embedding_dim
         self.hidden_dim = hidden_dim
-        self.vocab_size = vocab_size
-        self.word_embeddings = nn.Embedding(self.vocab_size, self.embedding_dim)
-        self.lstm_f = nn.LSTM(self.embedding_dim, self.hidden_dim, batch_first=True)
-        self.lstm_b = nn.LSTM(self.embedding_dim, self.hidden_dim, batch_first=True)
-        self.fc1 = nn.Linear(self.hidden_dim, self.hidden_dim)
-        self.fc2 = nn.Linear(self.hidden_dim, self.hidden_dim)
-        self.fc3 = nn.Linear(self.hidden_dim, self.vocab_size)
-        self.forward = self.forward_vlen if forward_mode == 'VLEN' else self.forward_flen
+        self.word_embeddings = nn.Embedding(in_dim, embedding_dim)
+        self.lstm_f = nn.LSTM(embedding_dim, hidden_dim, batch_first=True)
+        self.lstm_b = nn.LSTM(embedding_dim, hidden_dim, batch_first=True)
+        self.fc1 = nn.Linear(hidden_dim, hidden_dim)
+        self.fc2 = nn.Linear(hidden_dim, hidden_dim)
+        self.fc3 = nn.Linear(hidden_dim, out_dim)
+        self.forward = self.forward_flen if fixed_len else self.forward_vlen
         
     def forward_flen(self, Xs, _aa2id):
         batch_size = len(Xs)
@@ -73,7 +70,7 @@ class LSTM_Bi(nn.Module):
         # compute scores
         scores = F.log_softmax(out, dim=1)
         
-        return scores
+        return scores    
 
     def forward_vlen(self, Xs, _aa2id):
         batch_size = len(Xs)
@@ -139,34 +136,21 @@ class LSTM_Bi(nn.Module):
         # compute scores
         scores = F.log_softmax(out, dim=1)
         
-        return scores
+        return scores  
     
     def set_param(self, param_dict):
         try:
-            # pytorch tensors
             for pn, _ in self.named_parameters():
                 exec('self.%s.data = torch.tensor(param_dict[pn])' % pn)
-            
-            # hyperparameters
-            self.embedding_dim = param_dict['embedding_dim']
             self.hidden_dim = param_dict['hidden_dim']
-            self.vocab_size = param_dict['vocab_size']
-            
             self.to(self.device)
         except:
-            print('Unmatched parameter names or shapes.')        
+            print('Unmatched parameter names or shapes.')      
     
     def get_param(self):
         param_dict = {}
- 
-        # pytorch tensors
         for pn, pv in self.named_parameters():
             param_dict[pn] = pv.data.cpu().numpy()
-            
-        # hyperparameters
-        param_dict['embedding_dim'] = self.embedding_dim
         param_dict['hidden_dim'] = self.hidden_dim
-        param_dict['vocab_size'] = self.vocab_size
-
         return param_dict
         
