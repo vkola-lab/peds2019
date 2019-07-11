@@ -3,7 +3,7 @@
 """
 Created on Fri Jan 18 14:03:25 2019
 
-@author: cxue2
+@author: Chonghua Xue (Kolachalama's Lab, BU)
 """
 
 import torch

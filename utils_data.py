@@ -3,7 +3,7 @@
 """
 Created on Mon Jul  8 16:05:54 2019
 
-@author: cxue2
+@author: Chonghua Xue (Kolachalama's Lab, BU)
 """
 
 from torch.utils.data import Dataset
