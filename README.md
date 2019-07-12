@@ -1,4 +1,4 @@
-# Quantifying the nativeness of antibody sequences using LSTM
+# Quantifying the nativeness of antibody using LSTM
 
 One Paragraph of project description goes here
 
