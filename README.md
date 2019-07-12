@@ -1,6 +1,6 @@
-# Quantifying the nativeness of antibody using LSTM
+# Quantifying the nativeness of antibody sequences using long short-term memory networks
 
-One Paragraph of project description goes here
+This work was recently accepted for publication in Protein Engineering Design & Selection (https://academic.oup.com/peds). 
 
 ## Getting Started
 
