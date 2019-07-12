@@ -1,4 +1,4 @@
-# Quantifying the nativeness of antibody sequences using long short-term memory network
+# Quantifying the nativeness of antibody sequences using LSTM
 
 One Paragraph of project description goes here
 
