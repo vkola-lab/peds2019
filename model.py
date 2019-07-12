@@ -3,123 +3,143 @@
 """
 Created on Fri Jan 18 15:04:05 2019
 
-@author: cxue2
+@author: Chonghua Xue (Kolachalama's Lab, BU)
 """
 
-import sys
-sys.path.insert(0, '..') if '..' not in sys.path else 0
 from lstm_bi import LSTM_Bi
-from util.rand_batch_gen import rand_batch_gen
-import util.PDB_info_v3 as pdbinfo
+from utils_data import ProteinSeqDataset, aa2id_i, aa2id_o, collate_fn
+from tqdm import tqdm
 import numpy as np
 import torch
-from tqdm import tqdm
-from math import ceil
+import sys
 
 class ModelLSTM:
-    def __init__(self, embedding_dim, hidden_dim, vocab_dict, device='cpu'):
-        self.vocab_dict = vocab_dict
-        self.nn = LSTM_Bi(embedding_dim, hidden_dim, len(vocab_dict), device)
+    def __init__(self, embedding_dim=64, hidden_dim=64, device='cpu', gapped=True, fixed_len=True):
+        self.gapped = gapped
+        in_dim, out_dim = len(aa2id_i[gapped]), len(aa2id_o[gapped])
+        self.nn = LSTM_Bi(in_dim, embedding_dim, hidden_dim, out_dim, device, fixed_len)
         self.to(device)
         
-    def fit(self, Xt, Xv, n_epoch=100, b_size=32, lr=.2, save_model=False, n_iter_per_print=100):
+    def fit(self, trn_fn, vld_fn, n_epoch=100, trn_batch_size=128, vld_batch_size=512, lr=.2, save_fp=None):
+        # loss function and optimization algorithm
         loss_fn = torch.nn.NLLLoss()
-        op = torch.optim.Adam(self.nn.parameters(), lr=lr)        
-        min_val_loss = np.inf
+        op = torch.optim.Adam(self.nn.parameters(), lr=lr)
+        
+        # to track minimum validation loss
+        min_loss = np.inf
+        
+        # dataset and dataset loader
+        trn_data = ProteinSeqDataset(trn_fn, self.gapped)
+        vld_data = ProteinSeqDataset(vld_fn, self.gapped)
+        if trn_batch_size == -1: trn_batch_size = len(trn_data)
+        if vld_batch_size == -1: vld_batch_size = len(vld_data)
+        trn_dataloader = torch.utils.data.DataLoader(trn_data, trn_batch_size, True, collate_fn=collate_fn)
+        vld_dataloader = torch.utils.data.DataLoader(vld_data, vld_batch_size, False, collate_fn=collate_fn)
+        
         for epoch in range(n_epoch):
-            print('epoch: ' + str(epoch))
-            
             # training
             self.nn.train()
-            all_train_batch_idx = rand_batch_gen(b_size, len(Xt))
-            loss_all = 0
-            corr_all = 0
-            count = 0
-            
-            for _iter, batch_idx in enumerate(tqdm(all_train_batch_idx)):
-                X_batch = [Xt[idx] for idx in batch_idx]
-                
-                # sorting
-                X_batch = sorted(X_batch, key=lambda p: len(p))[::-1]
-
-                Y_batch = [x for seq in X_batch for x in seq]
-                Y_batch = torch.tensor(Y_batch).to(self.nn.device)
-                
-                self.nn.zero_grad()
-                scores = self.nn(X_batch, pdbinfo.aa2id)
-                loss = loss_fn(scores, Y_batch)
-                loss.backward()
-                op.step()
-                
-                count += len(Y_batch)
-                predicted = torch.argmax(scores, 1)
-                loss_all += loss.data.cpu().numpy() * len(Y_batch)  # total loss
-                corr_all += (predicted == Y_batch).sum().data.cpu().numpy()  # totol hits
-                
-                if _iter % n_iter_per_print == 0 and _iter != 0:
-                    tqdm.write('\ttrain_loss: ' + str(loss_all / count) +
-                               '\ttrain_acc: ' + str(corr_all / count))
-                    loss_all = 0
-                    corr_all = 0
-                    count = 0
+            loss_avg, acc_avg, cnt = 0, 0, 0
+            with tqdm(total=len(trn_data), desc='Epoch {:03d} (TRN)'.format(epoch), ascii=True, unit='seq', bar_format='{l_bar}{r_bar}') as pbar:
+                for batch, batch_flatten in trn_dataloader:
+                    # targets
+                    batch_flatten = torch.tensor(batch_flatten, device=self.nn.device)
+                    
+                    # forward and backward routine
+                    self.nn.zero_grad()
+                    scores = self.nn(batch, aa2id_i[self.gapped])
+                    loss = loss_fn(scores, batch_flatten)
+                    loss.backward()
+                    op.step()
+                    
+                    # compute statistics
+                    L = len(batch_flatten)
+                    predicted = torch.argmax(scores, 1)
+                    loss_avg = (loss_avg * cnt + loss.data.cpu().numpy() * L) / (cnt + L)
+                    corr = (predicted == batch_flatten).data.cpu().numpy()
+                    acc_avg = (acc_avg * cnt + sum(corr)) / (cnt + L)
+                    cnt += L
+                    
+                    # update progress bar
+                    pbar.set_postfix({'loss': '{:.6f}'.format(loss_avg), 'acc':  '{:.6f}'.format(acc_avg)})
+                    pbar.update(len(batch))
             
             # validation
             self.nn.eval()
-            all_batch_idx = rand_batch_gen(b_size, len(Xv))
-            loss_all = 0
-            corr_all = 0
-            count = 0
+            loss_avg, acc_avg, cnt = 0, 0, 0
             with torch.set_grad_enabled(False):
-                for _iter, batch_idx in enumerate(all_batch_idx):
-                    X_batch = [Xv[idx] for idx in batch_idx]
-                    X_batch = sorted(X_batch, key=lambda p: len(p))[::-1]
-                    Y_batch = [x for seq in X_batch for x in seq]
-                    Y_batch = torch.tensor(Y_batch).to(self.nn.device)
-                    scores = self.nn(X_batch, pdbinfo.aa2id) 
-                    count += len(Y_batch)
-                    loss = loss_fn(scores, Y_batch)
-                    predicted = torch.argmax(scores, 1)
-                    loss_all += loss.data.cpu().numpy() * len(Y_batch)
-                    corr_all += (predicted == Y_batch).sum().data.cpu().numpy()  
-            print('val_loss: ' + str(loss_all/count) + 
-                  '\tval_acc: ' + str(corr_all/count))
+                with tqdm(total=len(vld_data), desc='          (VLD)'.format(epoch), ascii=True, unit='seq', bar_format='{l_bar}{r_bar}') as pbar:
+                    for batch, batch_flatten in vld_dataloader:
+                        # targets
+                        batch_flatten = torch.tensor(batch_flatten, device=self.nn.device)
+                        
+                        # forward routine
+                        scores = self.nn(batch, aa2id_i[self.gapped])
+                        loss = loss_fn(scores, batch_flatten)
+                        
+                        # compute statistics
+                        L = len(batch_flatten)
+                        predicted = torch.argmax(scores, 1)
+                        loss_avg = (loss_avg * cnt + loss.data.cpu().numpy() * L) / (cnt + L)
+                        corr = (predicted == batch_flatten).data.cpu().numpy()
+                        acc_avg = (acc_avg * cnt + sum(corr)) / (cnt + L)
+                        cnt += L
+                        
+                        # update progress bar
+                        pbar.set_postfix({'loss': '{:.6f}'.format(loss_avg), 'acc':  '{:.6f}'.format(acc_avg)})
+                        pbar.update(len(batch))
             
             # save model
-            val_loss = loss_all / count
-            if val_loss < min_val_loss and save_model:
-                min_val_loss = val_loss
-                self.save_model('./model/temp/lstm_' + str(val_loss) + '.npy')
+            if loss_avg < min_loss and save_fp:
+                min_loss = loss_avg
+                self.save('{}/lstm_{:.6f}.npy'.format(save_fp, loss_avg))
     
-    def score(self, X, b_size=32):
-        scores = np.zeros(len(X), dtype=np.float32)
-        n_seg = ceil(len(X) / b_size)
-        L = len(X[0])
+    def eval(self, fn, batch_size=512):        
+        # dataset and dataset loader
+        data = ProteinSeqDataset(fn, self.gapped)
+        if batch_size == -1: batch_size = len(data)
+        dataloader = torch.utils.data.DataLoader(data, batch_size, True, collate_fn=collate_fn)
+        
         self.nn.eval()
+        scores = np.zeros(len(data), dtype=np.float32)
+        sys.stdout.flush()
         with torch.set_grad_enabled(False):
-            for n in tqdm(range(n_seg)):
-                batch = X[n*b_size:(n+1)*b_size]
-                batch = sorted(batch, key=lambda p: len(p))[::-1]
-                b_len = [len(b) for b in batch]
-                n_seq = len(batch)
-                out = self.nn(batch, self.vocab_dict)
-                out_np = out.data.cpu().numpy()
-                b_len_cumsum = np.cumsum(b_len)
-                out_np = np.split(out_np, b_len_cumsum)[:-1]
-                out_np = [b.reshape((-1, len(self.vocab_dict))) for b in out_np]
-#                out_np = out.data.cpu().numpy().reshape((n_seq,L,len(self.vocab_dict)))
-                scores[n*b_size:(n+1)*b_size] = [-sum([out_np[i][j, batch[i][j]] for j in range(b_len[i])]) / b_len[i] for i in range(n_seq)]
+            with tqdm(total=len(data), ascii=True, unit='seq', bar_format='{l_bar}{r_bar}') as pbar:
+                for n, (batch, batch_flatten) in enumerate(dataloader):
+                    actual_batch_size = len(batch)  # last iteration may contain less sequences
+                    seq_len = [len(seq) for seq in batch]
+                    seq_len_cumsum = np.cumsum(seq_len)
+                    out = self.nn(batch, aa2id_i[self.gapped]).data.cpu().numpy()
+                    out = np.split(out, seq_len_cumsum)[:-1]
+                    batch_scores = []
+                    for i in range(actual_batch_size):
+                        pos_scores = []
+                        for j in range(seq_len[i]):
+                            pos_scores.append(out[i][j, batch[i][j]])
+                        batch_scores.append(-sum(pos_scores) / seq_len[i])    
+                    scores[n*batch_size:(n+1)*batch_size] = batch_scores
+                    pbar.update(len(batch))
         return scores
     
-    def save_model(self, fp):
+    def save(self, fn):
         param_dict = self.nn.get_param()
-        np.save(fp, param_dict)
+        param_dict['gapped'] = self.gapped
+        np.save(fn, param_dict)
     
-    def load_model(self, fp):
-        param_dict = np.load(fp).item()
+    def load(self, fn):
+        param_dict = np.load(fn).item()
+        self.gapped = param_dict['gapped']
         self.nn.set_param(param_dict)
 
     def to(self, device):
-        if device not in ['cpu', 'cuda:0', 'cuda:1', 'cuda:2', 'cuda:3']:
-            raise Exception('Invalid device.')
         self.nn.to(device)
         self.nn.device = device
+        
+    def summary(self):
+        for n, w in self.nn.named_parameters():
+            print('{}:\t{}'.format(n, w.shape))
+#        print('LSTM: \t{}'.format(self.nn.lstm_f.all_weights))
+        print('Fixed Length:\t{}'.format(self.nn.fixed_len) )
+        print('Gapped:\t{}'.format(self.gapped))
+        print('Device:\t{}'.format(self.nn.device))
+            
