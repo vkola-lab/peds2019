@@ -22,6 +22,7 @@ class LSTM_Bi(nn.Module):
         self.fc1 = nn.Linear(hidden_dim, hidden_dim)
         self.fc2 = nn.Linear(hidden_dim, hidden_dim)
         self.fc3 = nn.Linear(hidden_dim, out_dim)
+        self.fixed_len = fixed_len
         self.forward = self.forward_flen if fixed_len else self.forward_vlen
         
     def forward_flen(self, Xs, _aa2id):
@@ -109,8 +110,8 @@ class LSTM_Bi(nn.Module):
         lstm_out_b, _ = self.lstm_b(Xs_b, ini_hc_state_b)
         
         # unpack outputs
-        lstm_out_f, lstm_out_len = pad_packed_sequence(lstm_out_f, batch_first=True, enforce_sorted=False)
-        lstm_out_b, _            = pad_packed_sequence(lstm_out_b, batch_first=True, enforce_sorted=False)
+        lstm_out_f, lstm_out_len = pad_packed_sequence(lstm_out_f, batch_first=True)
+        lstm_out_b, _            = pad_packed_sequence(lstm_out_b, batch_first=True)
         
         lstm_out_valid_f = lstm_out_f.reshape(-1, self.hidden_dim)
         lstm_out_valid_b = lstm_out_b.reshape(-1, self.hidden_dim)    
@@ -143,6 +144,8 @@ class LSTM_Bi(nn.Module):
             for pn, _ in self.named_parameters():
                 exec('self.%s.data = torch.tensor(param_dict[pn])' % pn)
             self.hidden_dim = param_dict['hidden_dim']
+            self.fixed_len = param_dict['fixed_len']
+            self.forward = self.forward_flen if self.fixed_len else self.forward_vlen
             self.to(self.device)
         except:
             print('Unmatched parameter names or shapes.')      
@@ -152,5 +155,6 @@ class LSTM_Bi(nn.Module):
         for pn, pv in self.named_parameters():
             param_dict[pn] = pv.data.cpu().numpy()
         param_dict['hidden_dim'] = self.hidden_dim
+        param_dict['fixed_len'] = self.fixed_len
         return param_dict
         

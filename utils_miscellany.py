@@ -26,3 +26,9 @@ def load_config_xml(fn):
     rslt['fit']['lr'] = float(rslt['fit']['lr'])
     rslt['eval']['batch_size'] = int(rslt['eval']['batch_size'])
     return rslt
+
+def to_vlen(src_fn, tar_fn):
+    with open(src_fn, 'r') as f:
+        lns = [ln.strip('\n').replace('-', '') for ln in f]
+    with open(tar_fn, 'w') as f:
+        f.write('\n'.join(lns))

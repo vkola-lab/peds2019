@@ -123,13 +123,23 @@ class ModelLSTM:
     
     def save(self, fn):
         param_dict = self.nn.get_param()
+        param_dict['gapped'] = self.gapped
         np.save(fn, param_dict)
     
     def load(self, fn):
         param_dict = np.load(fn).item()
+        self.gapped = param_dict['gapped']
         self.nn.set_param(param_dict)
 
     def to(self, device):
         self.nn.to(device)
-        self.nn.device = device            
+        self.nn.device = device
+        
+    def summary(self):
+        for n, w in self.nn.named_parameters():
+            print('{}:\t{}'.format(n, w.shape))
+#        print('LSTM: \t{}'.format(self.nn.lstm_f.all_weights))
+        print('Fixed Length:\t{}'.format(self.nn.fixed_len) )
+        print('Gapped:\t{}'.format(self.gapped))
+        print('Device:\t{}'.format(self.nn.device))
             
