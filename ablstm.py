@@ -2,7 +2,7 @@
 """
 Created on Wed Jul 10 22:02:40 2019
 
-@author: Iluva
+@author: Chonghua Xue (Kolachalama's Lab, BU)
 """
 
 import argparse
