@@ -200,7 +200,7 @@ Returns:
 
 ### Command line
 
-#### `fit` manuel
+#### `fit` manual
 ```bash
 usage: ablstm.py fit [-h] [-l L] [-c C] [-d D] TRN_FN VLD_FN SAVE_FP
 
@@ -216,7 +216,7 @@ optional arguments:
   -d D        device (default: "cpu")
 ```
 
-#### `eval` manuel
+#### `eval` manual
 ```bash
 usage: ablstm.py eval [-h] [-c C] [-d D] TST_FN MDL_FN SCR_FN
 
