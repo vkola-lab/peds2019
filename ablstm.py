@@ -36,6 +36,20 @@ if __name__ == '__main__':
     conf = load_config_xml(args.c)
     
     if args.cmd == 'fit':
+        # initialize model
+        if not args.l:
+            param_ini = {'embedding_dim': conf['__init__']['embedding_dim'],
+                         'hidden_dim': conf['__init__']['hidden_dim'],
+                         'gapped': conf['__init__']['gapped'],
+                         'fixed_len': conf['__init__']['fixed_len'],
+                         'device': args.d}
+            model = ModelLSTM(**param_ini)
+        else:
+            param_ini = {'device': args.d}
+            model = ModelLSTM(**param_ini)
+            model.load(args.l)
+        
+        # fit model
         param_fit = {'trn_fn': args.TRN_FN,
                      'vld_fn': args.VLD_FN,
                      'n_epoch': conf['fit']['n_epoch'],
@@ -43,17 +57,6 @@ if __name__ == '__main__':
                      'vld_batch_size': conf['fit']['vld_batch_size'],
                      'lr': conf['fit']['lr'],
                      'save_fp': args.SAVE_FP}
-        if not args.l:
-            param_init = {'embedding_dim': conf['__init__']['embedding_dim'],
-                          'hidden_dim': conf['__init__']['hidden_dim'],
-                          'gapped': conf['__init__']['gapped'] == 'True',
-                          'fixed_len': conf['__init__']['fixed_len'] == 'True',
-                          'device': args.d}
-            model = ModelLSTM(**param_init)
-        else:
-            param_ini = {'device': args.d}
-            model = ModelLSTM(**param_ini)
-            model.load(args.l)
         model.fit(**param_fit)
         
     elif args.cmd == 'eval':

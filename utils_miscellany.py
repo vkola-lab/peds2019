@@ -16,10 +16,12 @@ def load_config_xml(fn):
         rslt[c1.tag] = {}
         for c2 in c1:
             rslt[c1.tag][c2.tag] = c2.text
+    assert rslt['__init__']['gapped'] in ['True', 'true', 'T', 't', 'False', 'false', 'F', 'f']
+    assert rslt['__init__']['fixed_len'] in ['True', 'true', 'T', 't', 'False', 'false', 'F', 'f']
     rslt['__init__']['embedding_dim'] = int(rslt['__init__']['embedding_dim'])
     rslt['__init__']['hidden_dim'] = int(rslt['__init__']['hidden_dim'])
-    rslt['__init__']['gapped'] = bool(rslt['__init__']['gapped'])
-    rslt['__init__']['fixed_len'] = bool(rslt['__init__']['fixed_len'])
+    rslt['__init__']['gapped'] = bool(rslt['__init__']['gapped'] in ['True', 'true', 'T', 't'])
+    rslt['__init__']['fixed_len'] = bool(rslt['__init__']['fixed_len'] in ['True', 'true', 'T', 't'])
     rslt['fit']['n_epoch'] = int(rslt['fit']['n_epoch'])
     rslt['fit']['trn_batch_size'] = int(rslt['fit']['trn_batch_size'])
     rslt['fit']['vld_batch_size'] = int(rslt['fit']['vld_batch_size'])
