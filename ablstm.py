@@ -46,8 +46,8 @@ if __name__ == '__main__':
         if not args.l:
             param_init = {'embedding_dim': conf['__init__']['embedding_dim'],
                           'hidden_dim': conf['__init__']['hidden_dim'],
-                          'gapped': conf['__init__']['gapped'],
-                          'fixed_len': conf['__init__']['fixed_len'],
+                          'gapped': conf['__init__']['gapped'] == 'True',
+                          'fixed_len': conf['__init__']['fixed_len'] == 'True',
                           'device': args.d}
             model = ModelLSTM(**param_init)
         else:

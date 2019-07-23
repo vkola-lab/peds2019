@@ -127,7 +127,7 @@ class ModelLSTM:
         np.save(fn, param_dict)
     
     def load(self, fn):
-        param_dict = np.load(fn).item()
+        param_dict = np.load(fn, allow_pickle=True).item()
         self.gapped = param_dict['gapped']
         self.nn.set_param(param_dict)
 
