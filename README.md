@@ -14,15 +14,15 @@ The tool was developped based on the following dependencies:
 2. NumPy (1.16 or greater).
 3. tqdm (4.31 or greater).
 
-Please note that the dependencies may require Python 3.6 or greater. It is recommemded to install and maintain all packages by using [`conda`](https://www.anaconda.com/) or [`pip`](https://pypi.org/project/pip/). For the installation of GPU accelerated PyTorch, additional effort may be required. Please check the official websites of [PyTorch](https://pytorch.org/get-started/locally/) and [CUDA](https://developer.nvidia.com/cuda-downloads) for detailed instructions.
+Please note that the dependencies may require Python 3.6 or greater. It is recommemded to install and maintain all packages using [`conda`](https://www.anaconda.com/) or [`pip`](https://pypi.org/project/pip/). For the installation of GPU accelerated PyTorch, additional effort may be required. Please check the official websites of [PyTorch](https://pytorch.org/get-started/locally/) and [CUDA](https://developer.nvidia.com/cuda-downloads) for detailed instructions.
 
 ### Installation
 
-This is a lightweight project targetting the specific problem of antibody nativeness quantification, thus no sophisticated installation routine is required. All you need is to place it into your project repository and import at need. If you want to put it somewhere else, please check out [importlib.util](https://docs.python.org/3/library/importlib.html) module for more flexible import capability.
+This is a lightweight project targeting the problem related to quantifying nativeness of antibody sequences and therefore, no sophisticated installation routine is required. All you need is to place it into your project repository and import at need. If you want to put it somewhere else, please check out [importlib.util](https://docs.python.org/3/library/importlib.html) module for more flexible import capability.
 
 ## How to use
 
-These instructions will help you properly configure and use the tool either through function-call or command-line. For detailed usage of the parameters, you may refer to [Documentation](#documentation) section.
+These instructions will help you to properly configure and use the tool either through function-call or command-line. For detailed usage of the parameters, you may refer to [Documentation](#documentation) section.
 
 ### Data file format
 
@@ -69,7 +69,7 @@ model_loaded.load(fn='./saved_models/tmp/model_tmp.npy')
 
 #### Configuration XML
 
-Since neural network may have numerous parameters to configure, it may appear excessively verbose if we pass all of them by commands. Most of the model parameters, therefore, are stored within `<project_root>/ablstm.config` in XML format. The structure and the tag names exactly follow their corresponding Python class definition.
+Since the neural network may have numerous parameters to configure, it may appear excessively verbose if we pass all of them by commands. Most of the model parameters, therefore, are stored within `<project_root>/ablstm.config` in XML format. The structure and the tag names exactly follow their corresponding Python class definition.
 
 Here is the default configuration XML file.
 ```xml
@@ -95,7 +95,7 @@ Here is the default configuration XML file.
 
 #### Example
 
-To start a fresh training:
+To start fresh training:
 ```bash
 $ python ablstm.py fit ./data/sample/human_train.txt ./data/sample/human_val.txt ./saved_models/tmp
 ```
@@ -110,7 +110,7 @@ To use a configuration file other than `<project_root>/ablstm.config`:
 $ python ablstm.py fit ./data/sample/human_train.txt ./data/sample/human_val.txt ./saved_models/tmp -c ./ablstm_new.config
 ```
 
-To evaluate sequence scores by using a saved model:
+To evaluate sequence scores using a saved model:
 ```bash
 $ python ablstm.py eval ./data/sample/human_test.txt ./saved_models/tmp/model_tmp.npy ./results/result_human_test.txt
 ```
