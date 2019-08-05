@@ -55,7 +55,7 @@ model.fit(trn_fn=trn_fn, vld_fn=vld_fn, n_epoch=10, trn_batch_size=128, vld_batc
 To score sequences:
 ```python3
 tst_fn = './data/sample/human_test.txt'
-tst_scores = model.eval(fn=human_tst_fn, batch_size=512)
+tst_scores = model.eval(fn=tst_fn, batch_size=512)
 ```
 
 To save & load model:
