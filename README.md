@@ -237,7 +237,7 @@ optional arguments:
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under Creative Commons License BY-NC-SA. More info can be found here: https://en.wikipedia.org/wiki/Creative_Commons_license#Types_of_licenses
 
 ## Acknowledgments
 
