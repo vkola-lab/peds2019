@@ -58,7 +58,7 @@ tst_fn = './data/sample/human_test.txt'
 tst_scores = model.eval(fn=tst_fn, batch_size=512)
 ```
 
-To save & load model:
+To save and load model:
 ```python3
 model.save(fn='./saved_models/tmp/model_tmp.npy')
 model_loaded = ModelLSTM()
@@ -67,7 +67,7 @@ model_loaded.load(fn='./saved_models/tmp/model_tmp.npy')
 
 ### Call via command-line
 
-#### Configuration XML
+#### XML configuration
 
 Since the neural network may have numerous parameters to configure, it may appear excessively verbose if we pass all of them by commands. Most of the model parameters, therefore, are stored within `<project_root>/ablstm.config` in XML format. The structure and the tag names exactly follow their corresponding Python class definition.
 
@@ -120,7 +120,7 @@ python ablstm.py eval ./data/sample/human_test.txt ./saved_models/tmp/model_tmp.
 ### Class methods
 
 #### `ablstm.ModelLSTM.__init__()`
-> Initializes an LSTM model with the given paramters.
+> Initializes an LSTM model with the given parameters.
 
 Parameters:
 
@@ -131,7 +131,7 @@ Parameters:
 3. `device`: *str, default is 'cpu'*
 >> Device that the model will be mounted on. If GPU is available and CUDA is properly installed, you can assign `"cuda:0"` (or `"cuda:<DEVICE_INDEX>"` if you have more GPUs) that will greatly accelerate training and evaluation process.   
 4. `gapped`: *bool, default is True*
->> Indicate whether the input sequences contains gaps. A gap is always signified by `"-"`.
+>> Indicate whether the input sequences contain gaps. A gap is always denoted as `"-"`.
 5. `fixed_len`: *bool, default is True*
 >> Indicate whether the input sequences share equal length. It can be set `False` without any issue in all circumstances, but when the sequence lengths are assured to be the same, setting it `True` will help speed up the computation significantly.
 
@@ -156,7 +156,7 @@ Parameters:
 >> Path to save models. `None` or `""` means training without saving. If a valid path is given, model will be saved under the path after each epoch as long as the validation performance is better than the past.
 
 #### `ablstm.ModelLSTM.eval()`
-> scores the given sequences.
+> Scores the given sequences.
 
 Parameters:
 
