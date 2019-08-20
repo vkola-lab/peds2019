@@ -26,9 +26,9 @@ These instructions will help you to properly configure and use the tool either t
 
 ### Data file format
 
-All antibody protein sequences must be stored in plain-text format. A sequence consists of 20 amino acid symbol letters along with `"-"` to indicate gap, and sequences are deliminated by one single line-break. Please do not include spaces or extra line-breaks. You can find sample data files under `<project_root>/data/sample/`
+All antibody protein sequences must be stored in plain-text format. A sequence consists of 20 amino acid symbol letters along with `"-"` to indicate gap, and sequences are delimited by one single line-break. Please do not include spaces or extra line-breaks. You can find sample data files under `<project_root>/data/sample/`
 
-Here provides an example:
+Here we provide an example:
 ```
 -QVQLVQS-GAEVKKPGSSVKVSCTTSG-GTFSS-----FVINWMRQAPGQGLGWRGGIMPV---
 -EVQLLES-GGGLVQPGGSLRLSCAGSG-FTFSS-----YAMSWVRQTPGKGLEWVSVISGS---
@@ -136,7 +136,7 @@ Parameters:
 >> Indicate whether the input sequences share equal length. It can be set `False` without any issue in all circumstances, but when the sequence lengths are assured to be the same, setting it `True` will help speed up the computation significantly.
 
 #### `ablstm.ModelLSTM.fit()`
-> Fit the model via the given training and validation data.
+> Fit the model using the given training and validation data.
 
 Parameters:
 
