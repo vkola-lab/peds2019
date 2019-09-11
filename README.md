@@ -235,9 +235,6 @@ optional arguments:
 
 * **Chonghua Xue**, cxue2@bu.edu - Kolachalama laboratory, Boston University School of Medicine
 
-## License
-
-This project is licensed under Creative Commons License BY-NC-SA. More info can be found here: https://en.wikipedia.org/wiki/Creative_Commons_license#Types_of_licenses
 
 ## Acknowledgments
 
