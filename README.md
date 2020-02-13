@@ -2,7 +2,7 @@
 
 This work is published in Protein Engineering Design & Selection journal (https://academic.oup.com/peds/advance-article/doi/10.1093/protein/gzz031/5554642).
 
-<img src="Figure1.png" width="500"/> 
+<img src="Figure1.png" width="600"/> 
 
 ## Getting Started
 
