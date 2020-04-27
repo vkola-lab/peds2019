@@ -3,9 +3,8 @@
 This work is published in Protein Engineering Design & Selection journal (https://academic.oup.com/peds/advance-article/doi/10.1093/protein/gzz031/5554642).
 
 ### Citation 
-Wollacott AM, Xue C, Qin Q, Hua J, Bohnuud T, Viswanathan K, Kolachalama VB.  Protein Eng Des Sel. 2019 Dec 31;32(7):347-354.
-<a href="Quantifying the nativeness of antibody sequences using long short-term memory networks.
-" target="_blank"><img src="https://www.ncbi.nlm.nih.gov/pubmed/31504835"
+Wollacott AM, Xue C, Qin Q, Hua J, Bohnuud T, Viswanathan K, Kolachalama VB. <a href="
+" target="Quantifying the nativeness of antibody sequences using long short-term memory networks."><img src="https://www.ncbi.nlm.nih.gov/pubmed/31504835" Protein Eng Des Sel. 2019 Dec 31;32(7):347-354.
 
 <img src="Figure1.png" width="600"/> 
 
