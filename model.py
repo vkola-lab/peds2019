@@ -98,7 +98,7 @@ class ModelLSTM:
         # dataset and dataset loader
         data = ProteinSeqDataset(fn, self.gapped)
         if batch_size == -1: batch_size = len(data)
-        dataloader = torch.utils.data.DataLoader(data, batch_size, True, collate_fn=collate_fn)
+        dataloader = torch.utils.data.DataLoader(data, batch_size, False, collate_fn=collate_fn)
         
         self.nn.eval()
         scores = np.zeros(len(data), dtype=np.float32)
