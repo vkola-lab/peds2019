@@ -2,8 +2,7 @@
 
 This work is published in _Protein Engineering Design & Selection_ (https://doi.org/10.1093/protein/gzz031).
 
-### Citation 
-Wollacott AM, Xue C, Qin Q, Hua J, Bohnuud T, Viswanathan K, Kolachalama VB. [Quantifying the nativeness of antibody sequences using long short-term memory networks](https://www.ncbi.nlm.nih.gov/pubmed/31504835). Protein Eng Des Sel. 2019 Dec 31;32(7):347-354.
+# Introduction
 
 <img src="Figure1.png" width="600"/> 
 
