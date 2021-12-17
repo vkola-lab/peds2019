@@ -1,5 +1,11 @@
 # Quantifying the nativeness of antibody sequences using long short-term memory networks
 
+[![PyPI](https://img.shields.io/pypi/v/gluonts.svg?style=flat-square)](https://pypi.org/project/gluonts/)
+[![GitHub](https://img.shields.io/github/license/awslabs/gluon-ts.svg?style=flat-square)](./LICENSE)
+[![Static](https://img.shields.io/static/v1?label=docs&message=stable&color=blue&style=flat-square)][stable docs url]
+[![Static](https://img.shields.io/static/v1?label=docs&message=latest&color=blue&style=flat-square)][latest docs url]
+[![PyPI Downloads](https://pepy.tech/badge/gluonts)](https://pypi.org/project/gluonts/)
+
 This work is published in _Protein Engineering Design & Selection_ (https://doi.org/10.1093/protein/gzz031).
 
 # Introduction
